@@ -29,9 +29,25 @@ const styles = theme => ({
 
 class App extends Component {
 
-  state = {
-    customers :"",
-    completed: 0 //애니메이션 게이지 
+  constructor(props){
+    super(props);
+
+    this.state = {
+      customers: '',
+      completed: 0 //progress bar animation state 
+    }
+  }
+  
+  stateRefresh = () => { // addCustomer 후 이 함수를 사용하기 위해 Props로 전달.
+    this.state = {
+      customers: '',
+      completed: 0 
+    }
+    
+    this.callApi()
+    .then(res => this.setState({customers: res}))
+    .catch(err => console.log(err));
+ 
   }
 
   componentDidMount(){
@@ -62,18 +78,20 @@ class App extends Component {
           <Table className={classes.table}>
             <TableHead>
               <TableRow>
+                <TableCell></TableCell>
                 <TableCell>번호</TableCell>
                 <TableCell>이미지</TableCell>
                 <TableCell>이름</TableCell>
                 <TableCell>생년월일</TableCell>
                 <TableCell>성별</TableCell>
                 <TableCell>직업</TableCell>
+                <TableCell>가입날짜</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {this.state.customers ? this.state.customers.map( c => {return (<Customer key = {c.id} id={c.id}  image={c.image} name={c.name}  birthday={c.birthday} gender={c.gender}  job={c.job} /> )}) 
+              {this.state.customers ? this.state.customers.map( c => {return (<Customer stateRefresh={this.stateRefresh} key = {c.id} id={c.id}  image={c.image} name={c.name}  birthday={c.birthday} gender={c.gender} job={c.job} createdDate={c.createdDate}  /> )}) 
               : <TableRow>
-                  <TableCell colSpan="6" align="center">
+                  <TableCell colSpan="8" align="center">
                     <CircularProgress
                       className={classes.progress}
                       variant="determinate"
@@ -85,10 +103,7 @@ class App extends Component {
           </Table>
         </Paper>   
 
-        
-        <CustomerAdd/>
-       
-
+        <CustomerAdd stateRefresh={this.stateRefresh}/>   
       </div>
     );
   }

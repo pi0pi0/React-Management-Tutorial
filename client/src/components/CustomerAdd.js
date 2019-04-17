@@ -19,6 +19,7 @@ class CustomerAdd extends React.Component{
         this.addCustomer()
             .then((response) => {
                 console.log(response.data);
+                this.props.stateRefresh();
             })
         this.setState({
             file: null,
@@ -28,7 +29,8 @@ class CustomerAdd extends React.Component{
             job: '',
             fileName: ''
         })
-        window.location.reload();
+        // window.location.reload(); single window page (SPA) 방식으로 동작되어야 하므로 리로드 보다는 부모의 State 를 변경시켜야 한다. 
+        
     }
     
     handleFileChange = (e) => {
