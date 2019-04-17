@@ -21,6 +21,10 @@ const connection = mysql.createConnection({
 });
 connection.connect();
 
+const multer = require('multer');
+const upload = multer({dest: './upload'})
+
+
 app.get('/api/customers',(req,res)=>{
   connection.query(
     "SELECT * FROM CUSTOMER",
@@ -30,5 +34,21 @@ app.get('/api/customers',(req,res)=>{
   ); 
 });
 
+app.use('/image', express.static('./upload')); //express static 은 미들웨어 함수이다. upload 디렉토리를 /image에 정적으로 매핑
+
+app.post('/api/customers', upload.single('image'), (req, res) => {
+  let sql = 'INSERT INTO CUSTOMER VALUES (null, ?, ?, ?, ?, ?)';
+  let image = '/image/' + req.file.filename; //해당 파일네임은 multer가 겹치지 않는 이름 생성.
+  let name = req.body.name;
+  let birthday = req.body.birthday;
+  let gender = req.body.gender;
+  let job = req.body.job;
+  let params = [image, name, birthday,gender, job];
+  connection.query(sql, params,
+    (err, rows, fields) => {
+      res.send(rows);
+      console.log(err);
+    })
+});
 
 app.listen(port, () => console.log(`Listening on port ${port}` ));
