@@ -26,12 +26,6 @@ class CustomerDelete extends React.Component{
 
     handleClose = () => {
         this.setState({
-            file: null,
-            userName: '',
-            birthday: '',
-            gender: '',
-            job: '',
-            fileName: '',
             open: false
         })
     }
