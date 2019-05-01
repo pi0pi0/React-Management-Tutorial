@@ -6,6 +6,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Link from '@material-ui/core/Link';
 import { withStyles } from '@material-ui/core/styles';
  
 const styles = theme => ({
@@ -14,38 +15,30 @@ const styles = theme => ({
     }
 });
 
-class CustomerAdd extends React.Component{
+class CustomerDetail extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            file: null,
-            userName: '',
-            birthday: '',
-            gender: '',
-            job: '',
-            fileName: '',
+            id: this.props.id,
+            file: this.props.file,
+            userName: this.props.userName,
+            birthday: this.props.birthday,
+            gender: this.props.gender,
+            job: this.props.job,
+            fileName: this.props.fileName,
             open: false
+             
         }
     }
     
     handleFormSubmit = (e) => {
         e.preventDefault()
-        this.addCustomer()
+        this.modiCustomer()
             .then((response) => {
                 console.log(response.data);
-                this.props.stateRefresh();
+                this.handleClose();
             })
-        this.setState({
-            file: null,
-            userName: '',
-            birthday: '',
-            gender: '',
-            job: '',
-            fileName: '',
-            open: false
-        })
-        // window.location.reload(); single window page (SPA) 방식으로 동작되어야 하므로 리로드 보다는 부모의 State 를 변경시켜야 한다. 
-        
+   
     }
     
     handleFileChange = (e) => {
@@ -61,14 +54,16 @@ class CustomerAdd extends React.Component{
         this.setState(nextState);
     }
 
-    addCustomer = () => {
-        const url = '/api/customers';
+    modiCustomer = () => {
+        const url = '/api/customers/modify';
         const formData = new FormData();
+        
         formData.append('image', this.state.file); 
         formData.append('name',this.state.userName);
         formData.append('birthday',this.state.birthday);
         formData.append('gender',this.state.gender);
         formData.append('job',this.state.job);
+        formData.append('id', this.state.id);
 
         const config = {
             headers: {
@@ -86,12 +81,6 @@ class CustomerAdd extends React.Component{
 
     handleClose = () => {
         this.setState({
-            file: null,
-            userName: '',
-            birthday: '',
-            gender: '',
-            job: '',
-            fileName: '',
             open: false
         })
     }
@@ -100,20 +89,19 @@ class CustomerAdd extends React.Component{
         const { classes } = this.props; 
         return(
             <div>
-                <Button variant="contained" color="primary" onClick={this.handleClickOpen}>
-                    Add Customer 
-                </Button>
-                
+                <Link component="button" onClick={this.handleClickOpen}>{this.state.userName}</Link>
                 <Dialog open={this.state.open} onClose={this.handleClose}>
-                    <DialogTitle>고객 추가하기</DialogTitle>
+                    <DialogTitle>Title</DialogTitle>
+
                     <DialogContent>
                         <input className = {classes.hidden} accept="image/*" id="raised-button-file" type="file" file={this.state.file} value={this.state.fileName} onChange={this.handleFileChange}/><br/>
                         <label htmlFor="raised-button-file">
-                        <Button variant="contained" color="primary" component="span" name="file">
-                            {this.state.fileName === "" ? "프로필 이미지 선택" : this.state.fileName} 
-                        </Button>
+                            <Button variant="contained" color="primary" component="span" name="file">
+                                {this.state.fileName === "" ? "프로필 이미지 선택" : this.state.fileName} 
+                            </Button>
                         </label>
                         <br/>
+                        <input className = {classes.hidden} name={this.state.id}/>
                         <TextField label ="이름" type="text" name="userName" value={this.state.userName} onChange={this.handleValueChange}/><br/>
                         <TextField label ="생년월일" type="text" name="birthday" value={this.state.birthday} onChange={this.handleValueChange}/><br/>
                         <TextField label ="성별" type="text" name="gender"   value={this.state.gender} onChange={this.handleValueChange}/><br/> 
@@ -121,7 +109,7 @@ class CustomerAdd extends React.Component{
                     </DialogContent>
                     <DialogActions>
                         <Button variant ="contained" color="primary" onClick={this.handleFormSubmit}>
-                            추가
+                            수정
                         </Button>
                         <Button variant ="outlined" color="primary" onClick={this.handleClose}>
                             닫기
@@ -135,4 +123,4 @@ class CustomerAdd extends React.Component{
 }
 
 
-export default withStyles(styles)(CustomerAdd);
+export default withStyles(styles)(CustomerDetail);

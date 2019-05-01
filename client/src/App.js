@@ -106,14 +106,16 @@ class App extends Component {
 
     this.state = {
       customers: '',
-      completed: 0 //progress bar animation state 
+      completed: 0, //progress bar animation state 
+      searchKeyword: ''
     }
   }
   
   stateRefresh = () => { // addCustomer 후 이 함수를 사용하기 위해 Props로 전달.
     this.state = {
       customers: '',
-      completed: 0 
+      completed: 0,
+      searchKeyword: ''
     }
     
     this.callApi()
@@ -140,8 +142,23 @@ class App extends Component {
     this.setState({ completed: completed >= 100 ? 0 : completed + 1});
   }
 
+  handleValueChange = (e) => {
+    let nextState = {};
+    nextState[e.target.name] = e.target.value;
+    console.log('키워드' + e.target.value);
+    this.setState(nextState);
+  } 
 
   render() {
+    const filteredComponents = (data) => {
+      data = data.filter((c) => {
+        return c.name.indexOf(this.state.searchKeyword) > -1;
+      });
+      return data.map( (c) => {
+        return <Customer stateRefresh={this.stateRefresh} key={c.id} id={c.id}  image={c.image} name={c.name}  birthday={c.birthday} gender={c.gender} job={c.job}
+                         createdDate={c.createdDate} />
+      });
+    }
     const { classes } = this.props;   
     const cellList = ["", "번호","이미지","이름","생년월일","성별","직업","가입날짜"] 
     return (
@@ -164,8 +181,11 @@ class App extends Component {
               placeholder="Search…"
               classes={{
                 root: classes.inputRoot,
-                input: classes.inputInput,
+                input: classes.inputInput
               }}
+              name="searchKeyword"
+              value={this.state.searchKeyword}
+              onChange={this.handleValueChange}
             />
           </div>
         </Toolbar>
@@ -181,12 +201,13 @@ class App extends Component {
                   return (
                     <TableCell className={classes.tableHead}>{c}</TableCell>
                   )})
-                }}
+                }
               </TableRow>
             </TableHead>
             <TableBody>
-              {this.state.customers ? this.state.customers.map( c => {return (<Customer stateRefresh={this.stateRefresh} key = {c.id} id={c.id}  image={c.image} name={c.name}  birthday={c.birthday} gender={c.gender} job={c.job} createdDate={c.createdDate}  /> )}) 
-              : <TableRow>
+              {this.state.customers ?
+                filteredComponents(this.state.customers) : 
+               <TableRow>
                   <TableCell colSpan="8" align="center">
                     <CircularProgress
                       className={classes.progress}
